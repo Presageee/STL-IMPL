@@ -137,6 +137,7 @@ private:
 		else
 		{
 			buff = new T[len];
+			memset(buff, 0, sizeof(T) * len);
 		}
 	}
 
@@ -157,6 +158,7 @@ private:
 	{
 		calcLength(size);
 		T* newBuff = new T[len];
+		memset(newBuff, 0, sizeof(T) * len);
 		if (buff != NULL)
 		{
 			memcpy(newBuff, buff, sizeof(T) * index);
