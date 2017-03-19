@@ -118,6 +118,7 @@ public:
 		{
 			return buff[index];
 		}
+		throw new std::exception("index of -1");
 	}
 
 	inline int size()
