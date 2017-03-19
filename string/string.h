@@ -3,6 +3,7 @@
 #include "common.h"
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
 namespace lib
 {
 	class string
@@ -37,7 +38,7 @@ namespace lib
 			if (s.type == STACK)
 			{
 				strcpy(b_data, s.b_data);
-			} 
+			}
 			else
 			{
 				if (data == NULL)
@@ -58,33 +59,34 @@ namespace lib
 				data = nullptr;
 			}
 		}
-		
-		friend string &operator +(string &str, const string &str2)
+
+		friend string operator +(string &str, const string &str2)
 		{
-			if (str.expanison(str2.len))
+			string nStr(str);
+			if (nStr.expanison(str2.len))
 			{
 				if (str2.type == STACK)
 				{
-					memcpy(str.data + str.len, str2.b_data, sizeof(char) * str2.len);
-					str.len += str2.len;
+					memcpy(nStr.data + nStr.len, str2.b_data, sizeof(char) * str2.len);
+					nStr.len += str2.len;
 				}
 				else
 				{
-					memcpy(str.data + str.len, str2.data, sizeof(char) * str2.len);
-					str.len += str2.len;
+					memcpy(nStr.data + nStr.len, str2.data, sizeof(char) * str2.len);
+					nStr.len += str2.len;
 				}
 			}
 			else
 			{
-				memcpy(str.b_data + str.len, str2.b_data, sizeof(char) * str2.len);
-				str.len += str2.len;
+				memcpy(nStr.b_data + nStr.len, str2.b_data, sizeof(char) * str2.len);
+				nStr.len += str2.len;
 			}
-			return str;
+			return nStr;
 		}
 
-		
 
-		string & append(const string &str)
+
+		void append(const string &str)
 		{
 			if (expanison(str.len))
 			{
@@ -104,12 +106,24 @@ namespace lib
 				memcpy(this->b_data + this->len, str.b_data, sizeof(char) * str.len);
 				this->len += str.len;
 			}
-			return *this;
 		}
 
 		inline int length()
 		{
 			return this->len;
+		}
+
+		friend std::ostream &operator<<(std::ostream &o, const string &str)
+		{
+			if (str.type == STACK)
+			{
+				o << str.b_data;
+			} 
+			else
+			{
+				o << str.data;
+			}
+			return o;
 		}
 	private:
 		inline bool inHead()
@@ -127,13 +141,14 @@ namespace lib
 		inline void init(int size)
 		{
 			char* t_data = new char[size + 1];
+			memset(t_data, '\0', (size + 1) * sizeof(char));
 			if (data)
 			{
+				memcpy(t_data, data, sizeof(char) * len);
 				delete[] data;
 			}
-			memset(t_data, '\0', (size + 1) * sizeof(char));
 			data = t_data;
-			this->type = HEAP;
+//			this->type = HEAP;
 		}
 
 		inline int expanison(int size)
@@ -142,8 +157,12 @@ namespace lib
 			if (destLen > 15)
 			{
 				init(destLen);
-				memcpy(data, b_data, sizeof(char) * len);
-				memset(b_data, '\0', 16 * sizeof(char));
+				if (type == STACK)
+				{
+					memcpy(data, b_data, sizeof(char) * len);
+					memset(b_data, '\0', 16 * sizeof(char));
+				}
+				this->type = HEAP;
 				return R_OK;
 			}
 			return R_ERR;
